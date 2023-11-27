@@ -1,15 +1,12 @@
 //Note: /xyz/Arduino/libraries/ThingsBoard/src/Configuration.h -> line 48  define THINGSBOARD_ENABLE_OTA 1 to change  define THINGSBOARD_ENABLE_OTA 0
 
-#include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Ethernet.h>
 #include <SPI.h>
 #include <Wire.h>
 #include <ThingsBoard.h>
 #include <Arduino_MQTT_Client.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <vector>
+#include "Ticker.h"
 
 #define LENG 31 // 0x42 + 31 bytes equal to 32 bytes
 unsigned char buf[LENG];
@@ -28,6 +25,8 @@ struct PMValues
 #define THINGSBOARD_SERVER "demo.thingsboard.io"
 constexpr uint16_t THINGSBOARD_PORT = 1883;
 constexpr uint16_t MAX_MESSAGE_SIZE = 128;
+byte mac[] = {0x1E, 0x06, 0x43, 0x86, 0xAD, 0xC1};
+
 
 EthernetClient m0Client;
 Arduino_MQTT_Client mqttClient(m0Client);
@@ -36,7 +35,7 @@ ThingsBoard tb(mqttClient, MAX_MESSAGE_SIZE);
 void ethernetFirtsConnection()
 {
     // Serial.println("Connection...");
-    if ((Ethernet.begin() == 1))
+    if ((Ethernet.begin(mac) == 1))
     {
         Serial.println("Connected");
     }
@@ -74,14 +73,18 @@ void loop()
     tb.sendTelemetryData("PM1", returnedData.PM1);
     tb.sendTelemetryData("PM2_5", returnedData.PM25);
     tb.sendTelemetryData("PM10_0", returnedData.PM10);
+
+    tb.loop();
+
+    delay(5000);
 }
 
-void readPMValues()
+PMValues readPMValues()
 {
-    if (PMSerial.find(0x42))
+    if (Serial1.find(0x42))
     {
         delay(100);
-        PMSerial.readBytes(buf, LENG);
+        Serial1.readBytes(buf, LENG);
 
         if (buf[0] == 0x4d)
         {
@@ -99,24 +102,26 @@ void readPMValues()
     data.PM25 = PM2_5Value;
     data.PM10 = PM10Value;
 
-    static unsigned long OledTimer = millis();
-    if (millis() - OledTimer >= 1000)
-    {
-        OledTimer = millis();
+//    static unsigned long OledTimer = millis();
+//    if (millis() - OledTimer >= 1000)
+//    {
+//        OledTimer = millis();
+//
+//        Serial.print("PM1.0: ");
+//        Serial.print(PM01Value);
+//        Serial.println("  ug/m3");
+//
+//        Serial.print("PM2.5: ");
+//        Serial.print(PM2_5Value);
+//        Serial.println("  ug/m3");
+//
+//        Serial.print("PM1 0: ");
+//        Serial.print(PM10Value);
+//        Serial.println("  ug/m3");
+//        Serial.println();
+//    }
 
-        Serial.print("PM1.0: ");
-        Serial.print(PM01Value);
-        Serial.println("  ug/m3");
-
-        Serial.print("PM2.5: ");
-        Serial.print(PM2_5Value);
-        Serial.println("  ug/m3");
-
-        Serial.print("PM1 0: ");
-        Serial.print(PM10Value);
-        Serial.println("  ug/m3");
-        Serial.println();
-    }
+    return data;
 }
 
 char checkValue(unsigned char *thebuf, char leng)
