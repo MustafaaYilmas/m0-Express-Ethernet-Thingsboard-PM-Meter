@@ -1,6 +1,4 @@
-Certainly, I'll prepare the `README.md` file in English, incorporating the changes you've requested.
 
----
 
 # Particle Matter Sensor Data Transmission with Adafruit M0 Express and Ethernet
 
@@ -46,6 +44,3 @@ The code periodically reads data from the particle matter sensor. After establis
 
 If you encounter any issues with data transmission or connection, first check your Ethernet connection, ThingsBoard token settings, and network configurations.
 
----
-
-This `README.md` file explains the basic details of your project and how to set it up and operate it. You can further detail or customize this file according to the specific needs of your project.
