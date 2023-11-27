@@ -1,9 +1,15 @@
+//Note: /xyz/Arduino/libraries/ThingsBoard/src/Configuration.h -> line 48  define THINGSBOARD_ENABLE_OTA 1 to change  define THINGSBOARD_ENABLE_OTA 0
+
 #include <Arduino.h>
 #include <ArduinoJson.h>
-#include <Ethernet2.h>
-#include "ThingsBoard.h"
+#include <Ethernet.h>
+#include <SPI.h>
+#include <Wire.h>
+#include <ThingsBoard.h>
+#include <Arduino_MQTT_Client.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <vector>
 
 #define LENG 31 // 0x42 + 31 bytes equal to 32 bytes
 unsigned char buf[LENG];
@@ -15,12 +21,13 @@ int PM10Value = 0;  // define PM10 value of the air detector module
 struct PMValues
 {
     int PM1, PM25, PM10;
-}
+};
 
 // Credentials for the ThingsBoard platform
 #define TOKEN "pHYZ7VkKvoxTOyy6LDc1"
 #define THINGSBOARD_SERVER "demo.thingsboard.io"
 constexpr uint16_t THINGSBOARD_PORT = 1883;
+constexpr uint16_t MAX_MESSAGE_SIZE = 128;
 
 EthernetClient m0Client;
 Arduino_MQTT_Client mqttClient(m0Client);
